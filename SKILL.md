@@ -21,6 +21,10 @@ description: 用基于 Bookly 调校的 Typst 中文书籍样板排书：封面�
 - `title` / `author`：书名与作者；
 - `title-page`：副书名、版次、丛书、机构、封面图与 logo；
 - `paper-size`：`"a4"` 或 `"a5"`；
+- 主题色：`template/colors.typ` 顶部的 `book-theme` 一行切换，内置六主题——
+  朱砂（默认红）、靛蓝、松绿、赭石、紫棠、石墨。为避免每本书千篇一律，
+  创建新书时按内容气质挑选一个主题（或与用户确认），不要默认总是朱砂红；
+  换非默认主题时建议一并更换 `images/book-cover.jpg`（默认封面图按朱砂红调）；
 - 篇章结构：`#part-page([篇名], desc: [一两句导读])` + `#include "chapters/….typ"`。
 
 示例章节就是用法文档：`chapters/ch1.typ`（语言速览）、`chapters/ch2.typ`
@@ -71,7 +75,7 @@ New Computer Modern（西文与数学）、DejaVu Sans Mono（代码）——非
 | 文件 | 职责 |
 | --- | --- |
 | `main.typ` | 入口：书籍元数据、字体、行内样式、目录规则、篇章结构 |
-| `colors.typ` | 全书配色唯一来源，改色只改这里 |
+| `colors.typ` | 全书配色唯一来源：顶部一行切换主题（六主题内置），改色只改这里 |
 | `boxes.typ` | 提示框/定理环境/加框公式，Heroicons 图标 |
 | `figstyle.typ` | CeTZ 示意图、Fletcher 流程图、Lilaq 数据图的统一样式 |
 | `partpage.typ` | 篇章页（满版浅底 + 空心篇次数字 + 本篇小目录）与目录「篇」行 |

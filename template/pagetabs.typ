@@ -21,20 +21,17 @@
 #import "colors.typ": book-colors
 #import "chaptermark.typ": chapter-label
 
-// 每章一色（章次超出时重复使用最后一个）
+// 每章一色（章次超出时重复使用最后一个）：主题色打头，后接类型色循环。
+// 循环自动跳过与主题色相同的一枚（如朱砂主题的 red 本就等于 primary），
+// 换主题后无需回来维护这里的顺序。
+// 灰色排在末位：饱和度太低，黑白与彩色都不易分辨，不宜靠前。
 #let tab-colors = (
-  book-colors.primary, // 第 1 章 · 主题红
-  book-colors.blue, // 第 2 章 · 蓝
-  book-colors.green, // 第 3 章 · 绿
-  book-colors.orange, // 第 4 章 · 橙
-  book-colors.purple, // 第 5 章 · 紫
-  book-colors.teal, // 第 6 章 · 青
-  book-colors.navy, // 第 7 章 · 深蓝
-  book-colors.brown, // 第 8 章 · 棕
-  book-colors.rose, // 第 9 章 · 玫红（灰色饱和度太低，黑白与彩色都不易分辨）
-  book-colors.sky, // 第 10 章 · 天蓝
-  book-colors.olive, // 第 11 章 · 橄榄绿
-  book-colors.gray, // 第 12 章 · 灰
+  book-colors.primary, // 第 1 章 · 主题色
+  ..(book-colors.blue, book-colors.green, book-colors.orange,
+     book-colors.purple, book-colors.teal, book-colors.navy,
+     book-colors.brown, book-colors.rose, book-colors.sky,
+     book-colors.olive, book-colors.gray)
+    .filter(c => c != book-colors.primary),
 )
 
 #let outer-side-only = true

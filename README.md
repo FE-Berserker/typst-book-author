@@ -3,7 +3,8 @@
 一个 Agent Skills 技能：用基于 [Bookly](https://typst.app/universe/package/bookly) 5.1.1
 调校的 Typst 中文书籍样板排书。封面/版权页、目录（含「篇」行与图表目录）、
 篇章页、切口色标、书眉、提示框与定理环境、图表公式、GB/T 7714 参考文献、
-附录与封底开箱即用。
+附录与封底开箱即用。内置六个主题色（朱砂、靛蓝、松绿、赭石、紫棠、石墨），
+`colors.typ` 一行切换，全书签名色自动同步。
 
 ## 效果预览
 
@@ -28,7 +29,7 @@ typst-book-author/
 │   └── pitfalls.md        踩坑记录（不收敛/标题消失/字体异常…）
 └── template/              完整可编译的书籍样板
     ├── main.typ           入口：元数据、字体、目录规则、篇章结构
-    ├── colors.typ         全书配色唯一来源
+    ├── colors.typ         主题切换（六主题）与全书配色唯一来源
     ├── boxes.typ          提示框 / 定理环境 / 加框公式
     ├── figstyle.typ       CeTZ / Fletcher / Lilaq 统一图形样式
     ├── partpage.typ       篇章页与目录「篇」行
