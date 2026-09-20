@@ -1,6 +1,6 @@
 # typst-book-author
 
-一个 ZCode 技能（skill）：用基于 [Bookly](https://typst.app/universe/package/bookly) 5.1.1
+一个 Agent Skills 技能：用基于 [Bookly](https://typst.app/universe/package/bookly) 5.1.1
 调校的 Typst 中文书籍样板排书。封面/版权页、目录（含「篇」行与图表目录）、
 篇章页、切口色标、书眉、提示框与定理环境、图表公式、GB/T 7714 参考文献、
 附录与封底开箱即用。
@@ -41,7 +41,7 @@ typst-book-author/
 
 ## 安装
 
-把本文件夹放进技能目录即可（ZCode 会自动发现）：
+把本文件夹放进技能目录即可，支持 [Agent Skills](https://agentskills.io) 规范的工具会自动发现：
 
 ```
 ~/.agents/skills/typst-book-author/     # 个人技能（所有项目可用）
@@ -50,7 +50,7 @@ typst-book-author/
 
 ## 使用
 
-对 ZCode 说「帮我把这些笔记排成一本书」「用 Typst 写一本中文教材」之类的话，
+对支持 Agent Skills 的 AI 编程助手说「帮我把这些笔记排成一本书」「用 Typst 写一本中文教材」之类的话，
 技能会自动触发：复制 `template/` 到你的项目、改元数据、替换内容、给出编译命令。
 也可以直接手动使用模板：
 
