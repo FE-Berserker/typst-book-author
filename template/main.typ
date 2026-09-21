@@ -90,6 +90,19 @@
 // set 规则够不着，需要用 boxes.typ 里的 subfigure-zh 代替。
 #show figure.where(kind: image): set figure(supplement: [图])
 
+// 插图保护：不设 width 的 image 按自然尺寸渲染（1 像素 = 1pt），随手插入的
+// 截图动辄远超版心，向右冲出页面、盖住页边距。这里把「不设宽度且自然宽度
+// 超过当前位置可用宽度」的图等比缩到刚好放下（用 scale 而不是重建 image：
+// 相对路径按原文件解析，换了文件重建会解析错位置）。显式写了 width 的图
+// 一律不动——有意设置哪怕超宽也尊重；想全宽就明写 width: 100%。
+#show image: it => layout(sz => context {
+  if it.width != auto { return it }
+  let w = measure(it).width
+  if w <= sz.width { return it }
+  let f = (sz.width / w) * 100%
+  scale(it, x: f, y: f)
+})
+
 // 中文排版惯例：正文思源宋体（Noto Serif SC）、标题与强调用黑体。
 // 注意：字体链中不要放入只安装了单一粗字重的字体族（例如仅装 Heavy 的思源宋体），
 // 否则 Typst 找不到常规字重时会退回该粗字重，导致正文整体显示为特粗。
