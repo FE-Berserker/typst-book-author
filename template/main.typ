@@ -160,6 +160,10 @@
 // 中文题注惯例是「图 1.1　标题」，用的是全角空格，不是西文的连接号
 // （Bookly 默认给的是「–」，见 bookly 的 figure.caption(separator: [ -- ])）。
 #show figure: set figure.caption(separator: [　])
+// 表题在上、图题在下（中文技术文档惯例）。表格的 auto 默认虽已是 top
+// （Typst 0.12 起），仍显式写死——不依赖版本默认，也不给主题/外部包留改默认的空间；
+// 图题保持 Typst 默认的 bottom，不走这条规则。
+#show figure.where(kind: table): set figure.caption(position: top)
 // 目录条目不该两端对齐：长条目被撑开后会留下孤零零的末行
 // （图表目录里「图 2.3」那一条最明显）。
 #show outline.entry: set par(justify: false)
