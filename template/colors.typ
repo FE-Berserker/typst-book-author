@@ -9,6 +9,11 @@
 // pagetabs.typ（切口色标）共用这一套色值：改这里一处，全书同步。
 // 各模块仍保留自己的局部别名（box-colors / palette / pp-colors / tab-colors），
 // 引用处代码不变。
+//
+// SYNC: book-colors 的色值（primary/tint 取 book-theme 当前指向的主题）与
+// typst-note-author/template/colors.typ 的 note-colors-base 相同，改色值要
+// 同步改那边，否则两套模板的配色会悄悄漂移；
+// typst-note-author/scripts/check_sync.py 可机检。
 // ============================================================
 
 // ---- 主题：换主题色只改这一行（可选值见下方 themes 表的键）----

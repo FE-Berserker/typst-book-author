@@ -70,6 +70,9 @@ typst compile main.typ 我的书.pdf
 - [CeTZ](https://typst.app/universe/package/cetz) / [Fletcher](https://typst.app/universe/package/fletcher) /
   [Lilaq](https://typst.app/universe/package/lilaq)（图形）
 - [Heroic](https://typst.app/universe/package/heroic)（Heroicons 图标）
+- 附录 app4–app6 的工程绘图示例另需 zap、bone、mechanical-system-cetz-34j、
+  arch-plotter、maquette、plotsy-3d、vmesh；其中 app4 的 cetz 固定为 0.5.0
+  （mechanical-system 按它构建），与 figstyle 的 0.5.2 并存属有意为之，勿合并升级。
 
 ## 许可
 

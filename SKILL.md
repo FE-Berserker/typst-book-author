@@ -57,7 +57,10 @@ typst compile main.typ 书名.pdf --pdf-standard a-2b
 ```
 
 要求 Typst 0.15+。首次编译需联网拉取 `@preview` 依赖
-（bookly 5.1.1、cetz、fletcher、lilaq、tiptoe、heroic）。
+（bookly 5.1.1、cetz、fletcher、lilaq、tiptoe、heroic；附录 app4–app6 的
+工程绘图示例另需 zap、bone、mechanical-system-cetz-34j、arch-plotter、
+maquette、plotsy-3d、vmesh。注意 app4 固定用 cetz 0.5.0——mechanical-system
+按它构建，与 figstyle 的 0.5.2 并存是有意的，勿合并升级）。
 字体依赖：Noto Serif SC（正文）、SimHei + Arial（标题）、KaiTi/STKaiti（强调）、
 New Computer Modern（西文与数学）、DejaVu Sans Mono（代码）——非 Windows 系统
 需要思源黑体/思源宋体兜底（字体链已配好）。
