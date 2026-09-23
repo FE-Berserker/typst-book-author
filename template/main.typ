@@ -19,6 +19,10 @@
 #import "runninghead.typ": book-header
 #import "boxes.typ": book-boxeq, book-custom-box
 
+// 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
+// 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
+#let template-version = "2026-09-23"
+
 // ---- 标题页（封面 + 版权页）----
 // 外面套一层 set par：Bookly 的标题页是在本文档的作用域里生成的，正文那条
 // 2em 首行缩进会漏进标题页——封面四行文字本该左缘对齐，加上缩进后「作者姓名」
