@@ -27,9 +27,19 @@ CRITICAL_RULES = [
     ),
     (
         "main.typ",
-        "过宽插图自动缩进版心",
-        r"#show image: it => layout",
-        "main.typ 补插图保护规则（#show image: it => layout(sz => context { … })），见技能模板",
+        "插图不被重复缩放（没有多余的 show image 规则）",
+        r"插图：不需要额外规则",
+        "删掉 #show image: it => layout(sz => context { … scale … }) 那一段。"
+        "Typst 自身会把过宽的图夹到容器宽度，旧规则把比例缩了两次"
+        "（实际宽度 = 版心² ÷ 自然宽），越宽的图越小，6000px 只剩版心 7%。"
+        "改法见技能模板 main.typ 的注释",
+    ),
+    (
+        "main.typ",
+        "代码块高亮主题（set raw(theme:) 与块级底板）",
+        r'set raw\(theme: "code-theme\.tmTheme"\)',
+        "main.typ 补 set raw(theme: \"code-theme.tmTheme\") 与"
+        " show raw.where(block: true) 底板规则，并把 code-theme.tmTheme 复制到项目根，见技能模板",
     ),
     (
         "colors.typ",
@@ -42,6 +52,7 @@ CRITICAL_RULES = [
 CORE = (
     "main.typ", "colors.typ", "boxes.typ", "chaptermark.typ",
     "figstyle.typ", "pagetabs.typ", "partpage.typ", "runninghead.typ",
+    "code-theme.tmTheme",
 )
 
 
@@ -77,19 +88,25 @@ def main():
             print(f"✓ 模板版本 {v_proj.group(1)}（与技能一致）")
 
         for fname, name, pat, fix in CRITICAL_RULES:
-            text = src if fname == "main.typ" else (root / fname).read_text(encoding="utf-8")
-            if re.search(pat, text):
+            fpath = root / fname
+            if not fpath.exists():
+                continue  # 缺文件已在上面计过一次
+            if re.search(pat, fpath.read_text(encoding="utf-8")):
                 print(f"✓ {name}")
             else:
                 print(f"✗ {name}——{fix}")
                 problems += 1
 
-    # 逐字节对比是信息性的：有差异可能是用户定制，也可能是旧拷贝
+    # 逐文件对比是信息性的：有差异可能是用户定制，也可能是旧拷贝。
+    # 比较前把 CRLF 归一成 LF——Windows 上的拷贝常落成 CRLF，
+    # 逐字节对比会把纯换行差异报成「有差异」，淹没真正的漂移
     if skill_tpl.is_dir():
         for f in CORE:
             a, b = root / f, skill_tpl / f
             if a.exists() and b.exists():
-                print(f"- {f}: {'与技能模板一致' if a.read_bytes() == b.read_bytes() else '有差异（你的定制，或旧拷贝）'}")
+                same = (a.read_text(encoding="utf-8").replace("\r\n", "\n")
+                        == b.read_text(encoding="utf-8").replace("\r\n", "\n"))
+                print(f"- {f}: {'与技能模板一致' if same else '有差异（你的定制，或旧拷贝）'}")
 
     if problems:
         print(f"[doctor] 发现 {problems} 个问题——修完再开工；拿不准时对照技能模板同步（保留你的定制）")

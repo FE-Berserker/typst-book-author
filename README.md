@@ -32,6 +32,7 @@ typst-book-author/
     ├── colors.typ         主题切换（六主题）与全书配色唯一来源
     ├── boxes.typ          提示框 / 定理环境 / 加框公式
     ├── figstyle.typ       CeTZ / Fletcher / Lilaq 统一图形样式
+    ├── code-theme.tmTheme 代码块语法高亮主题（色值与调色板同源）
     ├── partpage.typ       篇章页与目录「篇」行
     ├── chaptermark.typ    章首页装饰章号、装订边距
     ├── runninghead.typ    书眉

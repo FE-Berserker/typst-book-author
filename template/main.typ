@@ -18,10 +18,11 @@
 #import "chaptermark.typ": chapter-mark, margin-inside, margin-outside
 #import "runninghead.typ": book-header
 #import "boxes.typ": book-boxeq, book-custom-box
+#import "colors.typ": book-colors
 
 // 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
 // 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
-#let template-version = "2026-09-23"
+#let template-version = "2026-09-25"
 
 // ---- 标题页（封面 + 版权页）----
 // 外面套一层 set par：Bookly 的标题页是在本文档的作用域里生成的，正文那条
@@ -94,18 +95,17 @@
 // set 规则够不着，需要用 boxes.typ 里的 subfigure-zh 代替。
 #show figure.where(kind: image): set figure(supplement: [图])
 
-// 插图保护：不设 width 的 image 按自然尺寸渲染（1 像素 = 1pt），随手插入的
-// 截图动辄远超版心，向右冲出页面、盖住页边距。这里把「不设宽度且自然宽度
-// 超过当前位置可用宽度」的图等比缩到刚好放下（用 scale 而不是重建 image：
-// 相对路径按原文件解析，换了文件重建会解析错位置）。显式写了 width 的图
-// 一律不动——有意设置哪怕超宽也尊重；想全宽就明写 width: 100%。
-#show image: it => layout(sz => context {
-  if it.width != auto { return it }
-  let w = measure(it).width
-  if w <= sz.width { return it }
-  let f = (sz.width / w) * 100%
-  scale(it, x: f, y: f)
-})
+// ---- 插图：不需要额外规则 ----
+// Typst 自身就把「自然尺寸超过所在容器」的图夹到容器宽度（版心或 figure），
+// 小于容器的图保持原尺寸、不会被放大——实测 300px 到 6000px 的图
+// 在 裸段落 / figure / box 几种位置都如此，且不溢出。
+//
+// 这里曾经有一条 show image 规则，把过宽的图用 scale() 缩一遍。它是错的：
+// scale 的百分比是相对「已经被容器夹过之后的宽度」算的，而比例却按自然宽度
+// 求，于是缩了两次——实际宽度 = 版心² ÷ 自然宽。越宽的图缩得越狠，
+// 6000px 的图只剩版心的 7%，字小到看不清。显式写了 width 的图不受影响，
+// 所以这个毛病只出现在「随手插图、没写 width」的书稿里。
+// 教训：容器已经做过的约束不要再用 scale 补一遍；要改宽度就写 width。
 
 // 中文排版惯例：正文思源宋体（Noto Serif SC）、标题与强调用黑体。
 // 注意：字体链中不要放入只安装了单一粗字重的字体族（例如仅装 Heavy 的思源宋体），
@@ -157,6 +157,23 @@
   "New Computer Modern Math",
   "Noto Serif SC",
 ))
+
+// ---- 代码块：语法高亮 + 底板 ----
+// Typst 自带 syntect 高亮（语言标记的代码块默认就有颜色），这里换成与
+// 调色板同源的 tmTheme（色值见 code-theme.tmTheme 头部注释；与笔记模板
+// 共用同一份文件，check_sync.py 机检）。主题的 background 不会被渲染
+// （0.15 实测），底板由下面这条规则单独画。
+#set raw(theme: "code-theme.tmTheme")
+// 块级代码铺一层极浅的灰底、圆角，行内代码不铺。breakable: true：
+// 长清单跨页断得开，不会被整块推到下一页留下半页空白。
+#show raw.where(block: true): it => block(
+  fill: book-colors.tint-gray,
+  radius: 3pt,
+  inset: (x: 0.8em, y: 0.6em),
+  width: 100%,
+  breakable: true,
+  it,
+)
 
 // ---- 表格：统一列对齐，禁止单元格两端对齐 ----
 // 列默认左对齐，需要居中的列（公式、图标、数字）在各自的 table 里单独指定；

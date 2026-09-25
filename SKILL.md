@@ -91,6 +91,7 @@ New Computer Modern（西文与数学）、DejaVu Sans Mono（代码）——非
 | `colors.typ` | 全书配色唯一来源：顶部一行切换主题（六主题内置），改色只改这里 |
 | `boxes.typ` | 提示框/定理环境/加框公式，Heroicons 图标 |
 | `figstyle.typ` | CeTZ 示意图、Fletcher 流程图、Lilaq 数据图的统一样式 |
+| `code-theme.tmTheme` | 代码块语法高亮主题（syntect）：Typst 自带高亮，这份把配色换成调色板同源；`main.typ` 的 `set raw(theme:)` 引用 |
 | `partpage.typ` | 篇章页（满版浅底 + 空心篇次数字 + 本篇小目录）与目录「篇」行 |
 | `chaptermark.typ` | 章首页装饰章号；装订边距（inside/outside）也定义在这里 |
 | `runninghead.typ` | 书眉：偶页章名/奇页节名，节标题在页顶时回退章名 |

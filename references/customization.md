@@ -83,6 +83,21 @@ Noto Sans SC；KaiTi 缺失时宁可退回正文宋体）。**不要放只装了
 的字体族**（如仅 Heavy 的思源宋体）——找不到常规字重会退到粗字重，
 正文整体变特粗。
 
+## 改代码块的高亮与底板
+
+Typst 自带 syntect 语法高亮（写了语言标记的代码块默认就有颜色），模板把它
+换成了与调色板同源的 `code-theme.tmTheme`（关键字主题红、字符串青、数字橙、
+函数蓝、类型紫、注释灰），并对**块级**代码铺一层浅灰圆角底板（行内代码不铺）。
+
+- 改高亮颜色：编辑 `code-theme.tmTheme` 里对应 scope 的色值——这个文件与
+  笔记模板（typst-note-author）共用，逐字节一致，改完跑 `check_sync.py` 核对；
+- 底板颜色 / 圆角 / 内边距：`main.typ` 里 `show raw.where(block: true)` 那一条；
+- 换回 Typst 默认高亮：删掉 `main.typ` 里的 `set raw(theme: …)` 一行即可。
+
+注意 tmTheme 的 `background` 字段 Typst 不渲染（0.15 实测），底板只能靠
+`show raw.where(block: true)` 的 block fill 画——两者色值已写成一致，
+改的时候记得同步。
+
 ## 改书眉 / 页码
 
 - 书眉奇偶规则、回退逻辑、对齐：`runninghead.typ`；
