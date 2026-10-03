@@ -172,8 +172,9 @@
 )
 
 // 证明：不编号，结尾自动加 ∎（QED 符号，靠右对齐——正文以行间公式
-// 结尾时，不加 h(1fr) 的话 ∎ 会掉到下一行左端）
-#let proof(body, title: none) = showybox(
+// 结尾时，不加 h(1fr) 的话 ∎ 会掉到下一行左端）。超过一页的长证明
+// 显式传 breakable: true，否则会溢出页尾。
+#let proof(body, title: none, breakable: false) = showybox(
   title: box-title(
     hi("check-badge", height: 1em, color: white),
     [*证明#if title != none [（#title）]*],
@@ -181,7 +182,7 @@
   title-style: box-tab-style,
   frame: box-frame(box-colors.gray),
   align: center,
-  breakable: false,
+  breakable: breakable,
 )[#body #h(1fr) #sym.qed]
 
 // ============================================================
@@ -194,10 +195,13 @@
 // 规则管不到它，见 main.typ 的说明）。
 // ============================================================
 
+// 代码清单可能超过一页：book-custom-box 已改为默认不跨页，这里显式保持
+// breakable: true，免得长清单溢出页尾。
 #let code-box-zh = custom-box.with(
   title: [代码],
   icon: "code",
   color: box-colors.purple,
+  breakable: true,
 )
 
 #let subfigure-zh = subfigure.with(supplement: [图])
@@ -229,13 +233,18 @@
 // 唯一做了改写的是「证明」：内置的证明框是青色（eastern），而本书自己的
 // #proof 是灰色。同一个词在一本书里出现两种颜色，读者会以为印错了，
 // 这里把青色也归到灰色。
+//
+// breakable 默认值与 Bookly 上游相反（false，上游是 true）：短框跨页会断成
+// 「标题牌孤悬页尾、框身跑到下页」的两截（实测 #info-box 顶到页尾时复现），
+// 与上面 callout 默认不跨页是同一个理由。代码清单可能超过一页，所以
+// code-box-zh 显式保持 breakable: true；别的长框在调用点显式传同样的参数。
 // ============================================================
 
 #let book-custom-box(
   title: none,
   icon: "info",
   color: box-colors.blue,
-  breakable: true,
+  breakable: false,
   body,
 ) = {
   let color = if color == eastern { box-colors.gray } else { color }
