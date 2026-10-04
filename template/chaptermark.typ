@@ -6,8 +6,9 @@
 // 语言——「篇」用大号、「章」用小一号，读者一眼就能认出两级结构。
 //
 // 为什么画在页面背景里，而不是给标题加 show 规则：Bookly 的章标题整块由
-// 主题的 show 规则渲染，外面再加一条 show heading 规则会把整块标题顶掉
-// （模板里踩过这个坑）。画在背景层既不动主题，也不会挤动正文。
+// 主题的 show 规则渲染，自己另写一条「重建标题内容」的规则会把整块标题顶掉
+// （模板里踩过这个坑；只是包一层、原样转出 it 的规则则与主题链式共存，
+// main.typ 的标题西文提字号就是后者）。画在背景层既不动主题，也不挤正文。
 //
 // 只画在「本页有编号一级标题」的页面上：分部页、前言、摘要、参考文献
 // 这些无编号标题不会有章号，空白衬页也不会。
@@ -69,7 +70,7 @@
     dx: -right-margin(pg),
     dy: auto-margin(states.paper-size.get()) + chapter-mark-dy,
     text(
-      font: ("Arial", "SimHei"),
+      font: ("Noto Sans SC", "SimHei"), // 与篇章页底纹数字同一套（见 partpage.typ）
       size: chapter-mark-size,
       weight: "regular",
       fill: white,

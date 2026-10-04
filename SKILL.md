@@ -71,9 +71,10 @@ typst compile main.typ 书名.pdf --pdf-standard a-2b
 工程绘图示例另需 zap、bone、mechanical-system-cetz-34j、arch-plotter、
 maquette、plotsy-3d、vmesh。注意 app4 固定用 cetz 0.5.0——mechanical-system
 按它构建，与 figstyle 的 0.5.2 并存是有意的，勿合并升级）。
-字体依赖：Noto Serif SC（正文）、SimHei + Arial（标题）、KaiTi/STKaiti（强调）、
-New Computer Modern（西文与数学）、DejaVu Sans Mono（代码）——非 Windows 系统
-需要思源黑体/思源宋体兜底（字体链已配好）。
+字体依赖：Noto Serif SC（正文）、Noto Sans SC（标题，中西文同族同粗）、
+KaiTi/STKaiti（强调）、New Computer Modern（西文与数学）、DejaVu Sans Mono
+（代码）——思源黑体/思源宋体缺失时由 SimHei/SimSun 兜底（字体链已配好，
+标题观感会降一档）。
 
 ### 4. 定稿检查
 

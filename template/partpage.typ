@@ -34,8 +34,8 @@
 // ---- 配色：与 boxes.typ / figstyle.typ / pagetabs.typ 同源（见 colors.typ）----
 #let pp-colors = book-colors
 
-// 标题字体：与正文标题同一套（黑体 + 无衬线的西文，见 main.typ 的说明）
-#let pp-head-font = ("Arial", "SimHei")
+// 标题字体：与正文标题同一套（中西文同走思源黑体，见 main.typ 的说明）
+#let pp-head-font = ("Noto Sans SC", "SimHei")
 
 #let pp-max-entries = 16 // 小目录 entry 数的上限，超过就只列章（见 pp-contents）
 
@@ -149,12 +149,17 @@
         tracking: 0.35em,
       )[#part-label]
       #v(0.55em)
-      #text(
-        font: pp-head-font,
-        size: 2.7em,
-        fill: pp-colors.ink,
-        tracking: 0.12em,
-      )[#title]
+      // 篇名是展示标题：西文与数字提 6% 字号，与正文标题同一处理（见 main.typ）。
+      // 隐形的目录标题不处理——目录条目是家具不是展示标题，与章条目的观感一致。
+      #{
+        show regex("[A-Za-z0-9]+"): it => text(size: 1.06em, it)
+        text(
+          font: pp-head-font,
+          size: 2.7em,
+          fill: pp-colors.ink,
+          tracking: 0.12em,
+        )[#title]
+      }
       // 导读：左侧一道主题红竖线，把这段话与上面的标题分开。
       // 没有传 desc 时连分隔线一起省掉，免得留下一条下面空无一物的横线。
       #if desc != none {

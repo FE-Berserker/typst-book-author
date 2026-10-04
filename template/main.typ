@@ -22,7 +22,7 @@
 
 // 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
 // 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
-#let template-version = "2026-09-25"
+#let template-version = "2026-10-04"
 
 // ---- 标题页（封面 + 版权页）----
 // 外面套一层 set par：Bookly 的标题页是在本文档的作用域里生成的，正文那条
@@ -110,12 +110,25 @@
 // 中文排版惯例：正文思源宋体（Noto Serif SC）、标题与强调用黑体。
 // 注意：字体链中不要放入只安装了单一粗字重的字体族（例如仅装 Heavy 的思源宋体），
 // 否则 Typst 找不到常规字重时会退回该粗字重，导致正文整体显示为特粗。
-// 标题里的西文单独指定无衬线字体：Typst 的标题自带 bold，若让西文走
-// New Computer Modern，字重落在它的粗体上，衬线明显、笔画对比强，
-// 挨着黑体像是另一个年代的字；换成 Arial（SimHei 自带的西文也是同族的无衬线）后，
-// 「Typst 语言速览」这种中英混排的标题才是一整块黑。
-// 链尾的 Noto Sans SC 是给非 Windows 系统的兜底（SimHei 是 Windows 字体）。
-#show heading: set text(font: ("Arial", "SimHei", "Noto Sans SC"))
+// 标题中西文与汉字同走思源黑体：Noto Sans SC 的西文与汉字本就是配套设计，
+// 且中西文都有真粗体，「Typst 语言速览」这种混排标题是同族同粗的一整块黑。
+// 早先的方案是西文走 Arial（为避免 NCM 的粗衬线挨着黑体），但它有两个毛病：
+// SimHei 没有粗体字面而 Typst 不做伪粗体，中文标题实际是常规字重、挨着西文的
+// 真粗体，粗细不对称；Arial 的 x-height 又明显小于汉字字面，同字号下西文
+// 显小一圈。SimHei 留在链上兜底：没装思源黑体的系统里中西文都落 SimHei，
+// 仍是同族之字（代价是标题字重降回常规）。
+#show heading: set text(font: ("Noto Sans SC", "SimHei"))
+// 标题里的西文与数字再提 6% 字号：拉丁字母的字面率（x-height 约占字身框一半）
+// 与撑满字身框的汉字（约九成）天生有差距，即便同族同字号，西文视觉上仍小一圈。
+// 按中文出版惯例放大 1.06 倍让中英字面看齐（1.05–1.08 都是常用值，要调改这里）；
+// 正文不放大——那里的大小差是中西混排的通行观感。
+// 这条转换型 show 规则只是包一层、原样转出 it：实测它与 Bookly 主题的标题
+// show 规则链式共存（章标题版式、篇章页隐形标题都不受影响）；作用域只圈住
+// 标题本身，正文、书眉与目录里的西文保持原字号。
+#show heading: it => {
+  show regex("[A-Za-z0-9]+"): it => text(size: 1.06em, it)
+  it
+}
 #show table.cell.where(y: 0): set text(font: (
   "New Computer Modern",
   "SimHei",
