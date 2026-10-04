@@ -161,13 +161,19 @@
 // 标题里的行内代码要跟着标题字号走：Bookly 把所有 raw 的字号钉死在 0.8 倍
 // 正文字号（绝对值 8.4pt，见 bookly.typ 的 show raw 规则）——正文里这是
 // 「代码小一号」的惯例，但标题再大代码也不动，章标题「求解契约：solve()
-// 的值语义」里代码因此只有汉字一半高。在标题作用域里把行内代码改回随标题
-// 字号走，并提 5% 补上 mono 与汉字的字面率差（实测 ×1.00 已齐平、×1.10
-// 开始压过汉字，取 1.05）。这条转换型规则只是包一层、原样转出 it，与
-// Bookly 主题的标题规则链式共存；正文、目录与书眉里的代码不受影响，
-// 仍是 8.4pt 的惯例小字。
+// 的值语义」里代码因此只有汉字一半高。
+// 修法和一次失败的教训：在标题作用域里 `set text(size: 1.05em)` 没用——
+// set size 的相对值会级联乘在钉死的 8.4pt 上（实测 8.4×1.05=8.82，约等于没修），
+// 只有绝对值才能盖掉钉死值。所以用 state 把标题当前字号探出来（标题字号
+// 随开本、随 bookly 内部系数变，硬编码靠不住），行内代码设成它的 1.05 倍
+// （5% 补 mono 与汉字的字面率差）。一级标题的正文按 classic 主题的
+// text(2em) 结构再乘 2（见 classic.typ 的 h1 规则）。这条转换型规则只是
+// 包一层、原样转出 it，与 Bookly 主题的标题规则链式共存；正文、目录与
+// 书眉里的代码不走这条规则，仍是 8.4pt 的惯例小字。
+#let head-raw-size = state("head-raw-size", 8.4pt)
 #show heading: it => {
-  show raw.where(block: false): set text(size: 1.05em)
+  show raw.where(block: false): it2 => context text(size: head-raw-size.get(), it2)
+  context head-raw-size.update(text.size * 1.05 * (if it.level == 1 { 2 } else { 1 }))
   it
 }
 
