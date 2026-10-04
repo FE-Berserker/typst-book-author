@@ -64,6 +64,12 @@ raw 与 math.equation 的字体是纯西文的，Typst 在系统字体里随机�
 指定无衬线：`#show heading: set text(font: ("Arial", "SimHei",
 "Noto Sans SC"))`。
 
+**标题里的行内代码只有汉字一半高**
+Bookly 把所有 raw 的字号钉死在 0.8 倍正文字号（绝对值 8.4pt）——正文里
+这是惯例，但标题再大代码也不跟着走。在标题作用域里把行内代码改回随标题
+字号走并提 5%（规则见 main.typ「标题里的行内代码」一节）：
+`#show heading: it => { show raw.where(block: false): set text(size: 1.05em); it }`。
+
 ## 表格
 
 **表格题注跑到了表格下方**
