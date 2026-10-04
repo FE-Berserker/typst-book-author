@@ -59,14 +59,10 @@ raw 与 math.equation 的字体是纯西文的，Typst 在系统字体里随机�
 `#show emph: set text(font: ("New Computer Modern", "KaiTi", "STKaiti",
 "Noto Serif SC"))`。加粗同理不要用换黑体冒充（那是换字体，删字重后失效）。
 
-**中英混排标题「不是一个整体」/ 标题里的英文又小又怪**
-标题西文走 NCM 时 bold 落在衬线粗体上，挨着黑体像两个年代；用 Arial 配
-SimHei 也不行——SimHei 没有粗体字面而 Typst 不做伪粗体，中文实际是常规
-字重挨着西文真粗体，且 Arial 的 x-height 明显小于汉字字面，同字号显小一圈。
-正解：中西文同走思源黑体，再给标题西文提 6% 字号：
-`#show heading: set text(font: ("Noto Sans SC", "SimHei"))`，
-提字号规则见 main.typ「标题」一节（转换型 show 规则只是包一层、原样转出
-it，与 Bookly 主题的标题规则链式共存）。
+**中英混排标题「不是一个整体」**
+标题西文走 NCM 时 bold 落在衬线粗体上，挨着黑体像两个年代。西文单独
+指定无衬线：`#show heading: set text(font: ("Arial", "SimHei",
+"Noto Sans SC"))`。
 
 ## 表格
 
