@@ -110,12 +110,14 @@
 // 中文排版惯例：正文思源宋体（Noto Serif SC）、标题与强调用黑体。
 // 注意：字体链中不要放入只安装了单一粗字重的字体族（例如仅装 Heavy 的思源宋体），
 // 否则 Typst 找不到常规字重时会退回该粗字重，导致正文整体显示为特粗。
-// 标题里的西文单独指定无衬线字体：Typst 的标题自带 bold，若让西文走
-// New Computer Modern，字重落在它的粗体上，衬线明显、笔画对比强，
-// 挨着黑体像是另一个年代的字；换成 Arial（SimHei 自带的西文也是同族的无衬线）后，
-// 「Typst 语言速览」这种中英混排的标题才是一整块黑。
-// 链尾的 Noto Sans SC 是给非 Windows 系统的兜底（SimHei 是 Windows 字体）。
-#show heading: set text(font: ("Arial", "SimHei", "Noto Sans SC"))
+// 标题中西文与汉字同走 SimHei 自带西文：SimHei 没有粗体字形而 Typst 不做伪
+// 粗体，标题的 bold 对汉字无效（实际是常规字重）。早先让西文走 Arial，结果
+// 是真粗体挨着常规体——实测同一标题里 Arial Bold 的竖笔画比 SimHei 汉字粗
+// 42%（8.5px vs 6px），「英文明显比中文粗」就是这么来的。SimHei 自带的西文
+// 与汉字同一个字体文件、同一字重（实测 5px = 5px），才是字面意义的「一整块
+// 黑」。链尾 Noto Sans SC 是非 Windows 兜底：它中西文同族同粗，整体落到它
+// 观感也不散。
+#show heading: set text(font: ("SimHei", "Noto Sans SC"))
 #show table.cell.where(y: 0): set text(font: (
   "New Computer Modern",
   "SimHei",
@@ -161,9 +163,8 @@
 // 标题里的行内代码要跟着标题走，包括字号与字体：Bookly 把所有 raw 的字号
 // 钉死在 0.8 倍正文字号（绝对值 8.4pt，见 bookly.typ 的 show raw 规则），
 // 标题再大代码也不动，章标题「求解契约：solve() 的值语义」里代码只有汉字
-// 一半高；而等宽字体（DejaVu Sans Mono）放在黑体标题里风格突兀，
-// 「受控词表与 draw(ax)」读起来像标题里掉进去一段终端。所以在标题作用域里，
-// 行内代码改用与标题同一套的字体、并设成标题字号的 1.05 倍（5% 补字面率差）。
+// 一半高；而等宽字体（DejaVu Sans Mono）放在黑体标题里风格突兀。所以在
+// 标题作用域里，行内代码改用与标题同一套的 SimHei、字号与标题正文相同。
 // 修法和一次失败的教训：`set text(size: 1.05em)` 这种相对值会级联乘在钉死
 // 的 8.4pt 上（实测 8.4×1.05=8.82，约等于没修），只有绝对值盖得住；标题字号
 // 随开本、随 bookly 内部系数变，硬编码靠不住，故用 state 现场探出来。一级
@@ -173,11 +174,11 @@
 #let head-raw-size = state("head-raw-size", 8.4pt)
 #show heading: it => {
   show raw.where(block: false): it2 => context text(
-    font: ("Arial", "SimHei", "Noto Sans SC"),
+    font: ("SimHei", "Noto Sans SC"),
     size: head-raw-size.get(),
     it2,
   )
-  context head-raw-size.update(text.size * 1.05 * (if it.level == 1 { 2 } else { 1 }))
+  context head-raw-size.update(text.size * (if it.level == 1 { 2 } else { 1 }))
   it
 }
 

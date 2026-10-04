@@ -34,8 +34,8 @@
 // ---- 配色：与 boxes.typ / figstyle.typ / pagetabs.typ 同源（见 colors.typ）----
 #let pp-colors = book-colors
 
-// 标题字体：与正文标题同一套（黑体 + 无衬线的西文，见 main.typ 的说明）
-#let pp-head-font = ("Arial", "SimHei")
+// 标题字体：与正文标题同一套（中西文同走 SimHei，见 main.typ 的说明）
+#let pp-head-font = ("SimHei", "Noto Sans SC")
 
 #let pp-max-entries = 16 // 小目录 entry 数的上限，超过就只列章（见 pp-contents）
 

@@ -59,16 +59,19 @@ raw 与 math.equation 的字体是纯西文的，Typst 在系统字体里随机�
 `#show emph: set text(font: ("New Computer Modern", "KaiTi", "STKaiti",
 "Noto Serif SC"))`。加粗同理不要用换黑体冒充（那是换字体，删字重后失效）。
 
-**中英混排标题「不是一个整体」**
-标题西文走 NCM 时 bold 落在衬线粗体上，挨着黑体像两个年代。西文单独
-指定无衬线：`#show heading: set text(font: ("Arial", "SimHei",
-"Noto Sans SC"))`。
+**中英混排标题「英文明显比中文粗」/「不是一个整体」**
+标题西文走 NCM 时 bold 落在衬线粗体上，挨着黑体像两个年代；换成 Arial 更
+隐蔽但更糟——SimHei 没有粗体字形而 Typst 不做伪粗体，标题的 bold 对汉字
+无效，汉字是常规字重，Arial 却是真粗体，实测同一标题里 Arial Bold 竖笔画
+比 SimHei 汉字粗 42%。正解：西文也用 SimHei 自带西文（与汉字同文件、同
+字重，实测笔画 5px = 5px）：`#show heading: set text(font: ("SimHei",
+"Noto Sans SC"))`，非 Windows 兜底落思源黑体（中西文同族同粗）。
 
 **标题里的行内代码只有汉字一半高 / 等宽字体在标题里很突兀**
 Bookly 把所有 raw 的字号钉死在 0.8 倍正文字号（绝对值 8.4pt）——正文里
 这是惯例，但标题再大代码也不跟着走；而 DejaVu Sans Mono 的等宽字形放在
-黑体标题里风格突兀。标题作用域里要把行内代码换成标题同款字体、并设成
-标题字号的 1.05 倍。注意 `set text(size: 1.05em)` 没用：set size 的相对值
+黑体标题里风格突兀。标题作用域里要把行内代码换成 SimHei（与标题一体）、
+字号与标题正文相同。注意 `set text(size: 1.05em)` 没用：set size 的相对值
 会级联乘在钉死值上（8.4×1.05=8.82，约等于没修），必须用绝对值才能盖掉。
 正解是用 state 探出标题当前字号再设绝对值（规则见 main.typ「标题里的
 行内代码」一节），一级标题正文按 classic 主题的 text(2em) 结构再乘 2。

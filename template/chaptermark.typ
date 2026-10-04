@@ -69,7 +69,7 @@
     dx: -right-margin(pg),
     dy: auto-margin(states.paper-size.get()) + chapter-mark-dy,
     text(
-      font: ("Arial", "SimHei"),
+      font: ("SimHei", "Noto Sans SC"), // 与篇章页底纹数字同一套（见 partpage.typ）
       size: chapter-mark-size,
       weight: "regular",
       fill: white,
