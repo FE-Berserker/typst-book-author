@@ -109,6 +109,10 @@ def main() -> int:
         ap.print_help()
         return 1
 
+    # 参数先全验完再动磁盘：主题写错时不该留下半拉子的目录
+    if args.theme and args.theme not in themes:
+        fail(f"没有叫 {args.theme!r} 的主题，可选：{'、'.join(themes)}")
+
     for field, value in (("title", args.title), ("author", args.author),
                          ("subtitle", args.subtitle), ("institution", args.institution)):
         if value and any(ch in value for ch in '"\r\n'):
