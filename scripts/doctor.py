@@ -17,6 +17,11 @@ import re
 import sys
 from pathlib import Path
 
+# 中文 Windows 控制台默认 GBK，直接 print ✓/✗ 会 UnicodeEncodeError——
+# 而且崩在「检查通过」的分支上，看起来像项目坏了。与 check_sync.py 做法一致。
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 # 历次修复中「旧拷贝最容易缺」的关键规则（文件, 名称, 匹配, 补法）
 CRITICAL_RULES = [
     (
@@ -83,7 +88,11 @@ def main():
             print("✗ main.typ 没有版本戳——技能修复之前的旧拷贝，强烈建议对照技能模板逐条体检并同步")
             problems += 1
         elif v_skill and v_proj.group(1) != v_skill.group(1):
-            print(f"! 模板版本 {v_proj.group(1)} ≠ 技能 {v_skill.group(1)}：技能模板修过问题，逐条做规则体检")
+            # 版本落后是「三件事」之一，必须计入 problems，否则本文件到底是
+            # 「旧拷贝继续排版」的守门人，还是只打印一行提醒的观察者，说不清
+            print(f"! 模板版本 {v_proj.group(1)} ≠ 技能 {v_skill.group(1)}：技能模板修过问题，"
+                  f"对照技能模板逐条体检（保留你的定制），改完把版本戳设为 {v_skill.group(1)}")
+            problems += 1
         else:
             print(f"✓ 模板版本 {v_proj.group(1)}（与技能一致）")
 
