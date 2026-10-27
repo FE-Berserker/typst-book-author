@@ -18,16 +18,23 @@ description: 用基于 Bookly 调校的 Typst 中文书籍样板排书：封面�
 
 ### 1. 搭脚手架
 
-把本技能的 `template/` 整个目录复制到用户项目里（不要改动技能目录本身），
-然后编辑入口文件 `main.typ`：
+一条命令起新书（复制 `template/` 到项目目录，顺手把书名、作者、副书名、机构写进
+`main.typ`，并按内容气质挑一个主题色）：
 
-- `title` / `author`：书名与作者；
-- `title-page`：副书名、版次、丛书、机构、封面图与 logo；
+```bash
+python <技能目录>/scripts/scaffold.py --to <新书目录> \
+    --title "书名" --author "作者" --subtitle "副书名" --theme indigo
+```
+
+`--theme` 可选 `cinnabar`（朱砂，默认）/ `indigo` / `pine` / `ochre` / `zitan` /
+`graphite`，`--list-themes` 随时查；目标目录非空会拒绝，确认要合并加 `--force`。
+不想用脚本就把 `template/` 整个目录复制出去（不要改动技能目录本身），效果一样。
+
+脚手架建完，仍需手工调的地方：
+
+- `title-page`：封面图（`images/book-cover.jpg`，默认按朱砂红调，换非默认主题
+  时一并更换）、logo、版次、丛书；
 - `paper-size`：`"a4"` 或 `"a5"`；
-- 主题色：`template/colors.typ` 顶部的 `book-theme` 一行切换，内置六主题——
-  朱砂（默认红）、靛蓝、松绿、赭石、紫棠、石墨。为避免每本书千篇一律，
-  创建新书时按内容气质挑选一个主题（或与用户确认），不要默认总是朱砂红；
-  换非默认主题时建议一并更换 `images/book-cover.jpg`（默认封面图按朱砂红调）；
 - 篇章结构：`#part-page([篇名], desc: [一两句导读])` + `#include "chapters/….typ"`。
 
 示例章节就是用法文档：`chapters/ch1.typ`（语言速览）、`chapters/ch2.typ`

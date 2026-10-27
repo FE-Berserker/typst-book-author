@@ -27,6 +27,10 @@ typst-book-author/
 │   ├── design.md          版式架构与设计意图（改模块前读）
 │   ├── customization.md   常见定制任务（换色/开本/边距/扩框型…）
 │   └── pitfalls.md        踩坑记录（不收敛/标题消失/字体异常…）
+├── scripts/               技能侧工具（不进书稿项目）
+│   ├── scaffold.py        复制模板建新书，顺手写书名/作者/主题
+│   ├── doctor.py          旧拷贝体检（模板版本与已修规则）
+│   └── test_doctor.py     体检规则自检
 └── template/              完整可编译的书籍样板
     ├── main.typ           入口：元数据、字体、目录规则、篇章结构
     ├── colors.typ         主题切换（六主题）与全书配色唯一来源
@@ -61,13 +65,16 @@ typst-book-author/
 
 对支持 Agent Skills 的 AI 编程助手说「帮我把这些笔记排成一本书」「用 Typst 写一本中文教材」之类的话，
 技能会自动触发：复制 `template/` 到你的项目、改元数据、替换内容、给出编译命令。
-也可以直接手动使用模板：
+
+命令行起新书（也可手动 `cp -r template/ mybook/`）：
 
 ```bash
-cp -r template/ mybook/ && cd mybook
-# 编辑 main.typ（书名/作者）与 chapters/ 下的章节
-typst compile main.typ 我的书.pdf
+python scripts/scaffold.py --to mybook --title "我的书" --author "张三" --theme indigo
+cd mybook && typst compile main.typ "我的书.pdf"
 ```
+
+`--theme` 可选 cinnabar / indigo / pine / ochre / zitan / graphite
+（`--list-themes` 随时查）；目标目录非空会拒绝，确认合并加 `--force`。
 
 要求 Typst 0.15+，首次编译需联网拉取 `@preview` 依赖。字体依赖：
 思源宋体（Noto Serif SC）、SimHei、KaiTi、New Computer Modern、DejaVu Sans Mono。
