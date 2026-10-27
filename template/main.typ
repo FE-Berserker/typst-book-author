@@ -19,6 +19,7 @@
 #import "runninghead.typ": book-header
 #import "boxes.typ": book-boxeq, book-custom-box
 #import "colors.typ": book-colors
+#import "tables.typ": long-table
 
 // 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
 // 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
@@ -222,6 +223,11 @@
 // （Typst 0.12 起），仍显式写死——不依赖版本默认，也不给主题/外部包留改默认的空间；
 // 图题保持 Typst 默认的 bottom，不走这条规则。
 #show figure.where(kind: table): set figure.caption(position: top)
+// 表格允许跨页断开。figure 默认整体不可断：长表一页放不下时会被整块推到下一页，
+// 超出的行画在页面之外——打印和屏显都看不见，页数却不变，属于静默丢内容。
+// 只对表格放开：插图必须整张挪走，绝不能把图切成两半。
+// 配合 tables.typ 的 long-table 使用（自动重复表头、标「（续表）」）。
+#show figure.where(kind: table): set block(breakable: true)
 // 目录条目不该两端对齐：长条目被撑开后会留下孤零零的末行
 // （图表目录里「图 2.3」那一条最明显）。
 #show outline.entry: set par(justify: false)

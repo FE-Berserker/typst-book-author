@@ -98,6 +98,35 @@ Typst 会把 table 的 stroke 画进 column-gutter。用单元格内边距
 **窄格里最后一行被撑开**
 表格单元格继承两端对齐。逐格关掉：`#show table.cell: set par(justify: false)`。
 
+**跨页长表被静默截断（行凭空消失）**
+`figure` 默认是「不可断」的块。长表一页放不下时，Typst 不会把表拆到下一页，
+而是整块推到新页继续排——超出页面的行被画在页面之外：PDF 文本层里还在，
+打印和屏显都看不见，页数也不增加。实测 60 行的表只印出 22 行，剩下 38 行
+就这么没了，只看页数完全发现不了。
+
+两件事一起做才完整：
+1. 让表格可以断开（模板已在 `main.typ` 设好，且只对 table 放开）：
+   `#show figure.where(kind: table): set block(breakable: true)`
+2. 表头用 `table.header(…)` 包起来，Typst 才会在每一段续表的顶部重画表头。
+
+只做 1 会得到「续表没有表头」，只做 2 则根本没有续表（整块还是被推走）。
+一次写全就用 `tables.typ` 里的 `long-table`（章文件各自 import，不共享主文件作用域）：
+
+```typst
+#import "../tables.typ": long-table
+
+#long-table(
+  columns: (auto, 1fr, 1fr),
+  head: ([序号], [名称], [说明]),
+  caption: [长表题注，照样编号、照样能被 @ 引用],
+  ..rows.flatten(),
+)
+```
+
+「（续表）」标记模板不自动加：要判断「这一段是不是第一段」只能记录表格起始页
+再与当页比较，而起始页随分页变化，实测会让整本书五轮不收敛
+（`state ... did not converge`）。真要标就手写在表头最后一格，代价是它也出现在第一段。
+
 ## 目录
 
 **长条目被两端对齐撑开、留下孤零零的末行**

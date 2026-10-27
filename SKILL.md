@@ -75,6 +75,19 @@ python <技能目录>/scripts/doctor.py --root <用户项目>
 #figure(flow(...), caption: [流程图]) <fig:flow>   // 见 figstyle.typ：sketch/flow/chart/fn-plot
 ```
 
+长表（会跨页的表）别用裸 `#figure(table(...))`：figure 默认不可断，放不下时
+整块被推到下一页，超出页面的行画在页面之外——打印屏显都看不见，页数却不变。
+用 `tables.typ` 的 `long-table`（章文件里 `#import "../tables.typ": long-table`）：
+
+```typst
+#long-table(
+  columns: (auto, 1fr, 1fr),
+  head: ([序号], [名称], [说明]),
+  caption: [题注，照样编号、可被 @ 引用],
+  ..rows.flatten(),
+)
+```
+
 ### 3. 编译
 
 ```bash
@@ -126,6 +139,7 @@ python <技能目录>/scripts/blankpages.py --root <书稿目录> --write
 | `chaptermark.typ` | 章首页装饰章号；装订边距（inside/outside）也定义在这里 |
 | `runninghead.typ` | 书眉：偶页章名/奇页节名，节标题在页顶时回退章名 |
 | `pagetabs.typ` | 切口色标（拇指索引），颜色与位置随章次递增 |
+| `tables.typ` | 跨页长表：`long-table` 把「figure 可断 + 表头逐段重复 + 题注」包成一次调用 |
 
 技能侧的 `scripts/doctor.py`（旧拷贝体检）、`scripts/test_doctor.py`（体检规则
 自检）、`scripts/blankpages.py`（空白页与切口色标核对）与 `scripts/scaffold.py`
