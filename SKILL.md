@@ -88,6 +88,15 @@ python <技能目录>/scripts/doctor.py --root <用户项目>
 )
 ```
 
+插图默认是浮动的（`main.typ` 里 `#let float-images = true`）：图比剩余版面高时
+浮到页面顶部、正文接着往下排，不会在页底空出一大块。代价是图可能出现在引用
+段落之前；要严格按原位排就把它改成 `false`。
+
+图的尺寸用 `figures.typ` 的 `auto-image`（章文件里 `#import "../figures.typ": auto-image`）：
+横图自动撑满版心宽，竖图自动收到版心高度的 88%。只写 `width` 的竖图会被推高
+到页面外，只写 `height` 的横图会越过右边距——两种都试不得。路径按项目根解析
+（`images/photo.png`，不是 `../images/photo.png`），因为读文件发生在 `figures.typ` 里。
+
 ### 3. 编译
 
 ```bash
@@ -140,6 +149,7 @@ python <技能目录>/scripts/blankpages.py --root <书稿目录> --write
 | `runninghead.typ` | 书眉：偶页章名/奇页节名，节标题在页顶时回退章名 |
 | `pagetabs.typ` | 切口色标（拇指索引），颜色与位置随章次递增 |
 | `tables.typ` | 跨页长表：`long-table` 把「figure 可断 + 表头逐段重复 + 题注」包成一次调用 |
+| `figures.typ` | 插图尺寸助手 `auto-image`：横图撑满版心宽、竖图收到高度上限，两种越界都不会发生 |
 
 技能侧的 `scripts/doctor.py`（旧拷贝体检）、`scripts/test_doctor.py`（体检规则
 自检）、`scripts/blankpages.py`（空白页与切口色标核对）与 `scripts/scaffold.py`

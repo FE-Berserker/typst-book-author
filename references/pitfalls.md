@@ -127,6 +127,47 @@ Typst 会把 table 的 stroke 画进 column-gutter。用单元格内边距
 再与当页比较，而起始页随分页变化，实测会让整本书五轮不收敛
 （`state ... did not converge`）。真要标就手写在表头最后一格，代价是它也出现在第一段。
 
+## 插图
+
+**图太大 → 页底空出一大块**
+`figure` 默认占原位、整块不可断。图比当前页剩余版面高时，Typst 把它整块挪到
+下一页，当前页底部就空着——排版稿里看是「半页白」，页数还多出来。实测一张
+11cm 高的图能把页底空出 8cm。
+
+治本是让插图浮动：模板 `<template>/main.typ` 里的开关
+
+```typst
+#let float-images = true          // 改成 false 即严格按原位排
+```
+
+打开后插图浮到页面顶部，正文继续往下排把空白补满（实测页底空隙 8cm → 0.3cm）。
+代价是图文先后顺序会变：图可能出现在引用它的段落之前（读到「见图 1-2」时，
+图可能已在上页顶部）。学术书里这是通行做法；要严格保序就关掉开关，
+改成手工调段落位置或把图缩小。
+
+单张图临时浮动的写法：`#figure(auto-image("images/x.png"), caption: [...], placement: top)`。
+
+**竖图越出右边距 / 图被页面裁掉**
+只写 `width` 的竖图会被按比例推高，超过版心就落到页面外（PDF 文本层还在，
+纸上没有）；只写 `height` 的横图会被按比例推宽，越过右边距。两种写法各有一个坑。
+
+用 `figures.typ` 里的 `auto-image` 一次避开（章文件各自 import）：
+
+```typst
+#import "../figures.typ": auto-image
+
+#figure(auto-image("images/photo.png"), caption: [竖图按高度收，横图撑满版心宽])
+```
+
+注意路径口径：`auto-image` 内部才去读文件，所以**路径按 `figures.typ` 所在的
+项目根解析**，不是按调用它的章文件。「章在 `chapters/`、图在 `images/`」这种
+常规布局正好写 `images/photo.png`；写成 `../images/photo.png` 会报
+`path would escape the project root`。
+
+它是拿图量出来的自然宽高比做二选一：横图撑满版心宽，竖图收到版心高度的
+88%（剩下留给图注）。实测 1:4 的竖图渲染成 5.4 × 21.7cm、4:1 的横图
+16.0 × 4.0cm，都不越界。
+
 ## 目录
 
 **长条目被两端对齐撑开、留下孤零零的末行**

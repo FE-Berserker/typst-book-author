@@ -20,6 +20,7 @@
 #import "boxes.typ": book-boxeq, book-custom-box
 #import "colors.typ": book-colors
 #import "tables.typ": long-table
+#import "figures.typ": auto-image
 
 // 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
 // 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
@@ -95,6 +96,17 @@
 // 唯一的例外是 subfigure：它的 supplement 在 Bookly 定义处就绑定死了，
 // set 规则够不着，需要用 boxes.typ 里的 subfigure-zh 代替。
 #show figure.where(kind: image): set figure(supplement: [图])
+
+// ---- 插图浮动：把页底空白补满 ----
+// 图放不进当前页剩余版面时，figure 默认整块挪到下一页，当前页底部就空出
+// 一大块（实测 11cm 高的图能把页底空出 8cm）。打开这个开关，插图改为浮到
+// 页面顶部，正文接着往下排，把空白补满——学术书里插图通行的处理方式。
+// 代价：图可能出现在引用它的段落之前（读到「见图 1-2」时图可能已在上页顶部，
+// 或在本页顶部而说明文字在其后）。要严格保持图文先后顺序，把它设成 false。
+#let float-images = true
+#show figure.where(kind: image): set figure(
+  placement: if float-images { top } else { auto },
+)
 
 // ---- 插图：不需要额外规则 ----
 // Typst 自身就把「自然尺寸超过所在容器」的图夹到容器宽度（版心或 figure），

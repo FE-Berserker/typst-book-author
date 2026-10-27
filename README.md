@@ -42,6 +42,8 @@ typst-book-author/
     ├── chaptermark.typ    章首页装饰章号、装订边距
     ├── runninghead.typ    书眉
     ├── pagetabs.typ       切口色标（拇指索引）
+    ├── tables.typ         跨页长表 long-table（可断 + 表头逐段重复）
+    ├── figures.typ        插图尺寸助手 auto-image（横图撑满、竖图限高）
     ├── front_matter/  chapters/  appendix/   内容示例（即用法文档）
     └── bibliography/  images/  data/         文献库与素材
 ```
