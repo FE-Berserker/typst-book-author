@@ -97,15 +97,16 @@
 // set 规则够不着，需要用 boxes.typ 里的 subfigure-zh 代替。
 #show figure.where(kind: image): set figure(supplement: [图])
 
-// ---- 插图浮动：把页底空白补满 ----
-// 图放不进当前页剩余版面时，figure 默认整块挪到下一页，当前页底部就空出
-// 一大块（实测 11cm 高的图能把页底空出 8cm）。打开这个开关，插图改为浮到
-// 页面顶部，正文接着往下排，把空白补满——学术书里插图通行的处理方式。
-// 代价：图可能出现在引用它的段落之前（读到「见图 1-2」时图可能已在上页顶部，
-// 或在本页顶部而说明文字在其后）。要严格保持图文先后顺序，把它设成 false。
+// ---- 插图浮动：Typst 本来就浮，这个开关只用来关掉 ----
+// figure(placement: auto) 默认就是浮动：图放不进当前页剩余版面时挪到下一页顶部，
+// 正文接着往下排把空白补满。实测同一页：默认排法页底只空 0.5cm，把 placement
+// 换成 none 会空出 17cm。所以这里不需要「打开浮动」，只留一个关掉它的口子。
+// 设成 false 即换成 none：图严格留在原位，放不下就整块挪到下一页，页底出现空白带。
+// 另一个坑：#box(...)、#columns(...) 会把 figure 关进盒子，浮动静默失效
+// （实测 #box(figure(...)) 页底空出 17.7cm）。要让图浮动，别把它包进 box。
 #let float-images = true
 #show figure.where(kind: image): set figure(
-  placement: if float-images { top } else { auto },
+  placement: if float-images { auto } else { none },
 )
 
 // ---- 插图：不需要额外规则 ----

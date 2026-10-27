@@ -130,22 +130,23 @@ Typst 会把 table 的 stroke 画进 column-gutter。用单元格内边距
 ## 插图
 
 **图太大 → 页底空出一大块**
-`figure` 默认占原位、整块不可断。图比当前页剩余版面高时，Typst 把它整块挪到
-下一页，当前页底部就空着——排版稿里看是「半页白」，页数还多出来。实测一张
-11cm 高的图能把页底空出 8cm。
+Typst 的 `figure` 默认（`placement: auto`）**本来就浮动**：图放不进当前页剩余版面时
+挪到下一页顶部，正文接着往下排把空白补满。实测同一页：默认排法页底只空 0.5cm，
+换成 `placement: none` 会空出 17cm。所以「页底一大块空白」几乎都是浮动被关掉了，
+有两个静默的关掉方式：
 
-治本是让插图浮动：模板 `<template>/main.typ` 里的开关
+- 自己写了 `placement: none`；
+- 把 figure 包进 `#box(...)`、`#columns(...)` 这类容器（实测 `#box(figure(...))`
+  让同一页空出 17.7cm）。
+
+模板 `<template>/main.typ` 的开关只用来关掉浮动：
 
 ```typst
-#let float-images = true          // 改成 false 即严格按原位排
+#let float-images = true          // 改成 false 等于 placement: none：图回原位、页底留白
 ```
 
-打开后插图浮到页面顶部，正文继续往下排把空白补满（实测页底空隙 8cm → 0.3cm）。
-代价是图文先后顺序会变：图可能出现在引用它的段落之前（读到「见图 1-2」时，
-图可能已在上页顶部）。学术书里这是通行做法；要严格保序就关掉开关，
-改成手工调段落位置或把图缩小。
-
-单张图临时浮动的写法：`#figure(auto-image("images/x.png"), caption: [...], placement: top)`。
+要严格保序（图必须紧跟引用它的段落）就关掉它，代价是页底可能出现空白带；
+否则别动它。单张图临时浮动写 `placement: top`，临时钉死原位写 `placement: none`。
 
 **竖图越出右边距 / 图被页面裁掉**
 只写 `width` 的竖图会被按比例推高，超过版心就落到页面外（PDF 文本层还在，

@@ -88,9 +88,10 @@ python <技能目录>/scripts/doctor.py --root <用户项目>
 )
 ```
 
-插图默认是浮动的（`main.typ` 里 `#let float-images = true`）：图比剩余版面高时
-浮到页面顶部、正文接着往下排，不会在页底空出一大块。代价是图可能出现在引用
-段落之前；要严格按原位排就把它改成 `false`。
+插图默认就浮动（Typst `figure(placement: auto)` 的固有行为）：图比剩余版面高时
+挪到下一页顶部，正文接着往下排，页底不会空出一截（实测默认 0.5cm，关掉后 17cm）。
+`main.typ` 里的 `#let float-images` 只用来关掉它（改 `false` 等于 `placement: none`，
+图回原位、页底出现空白带）。别把 figure 包进 `#box(...)`，那会静默关掉浮动。
 
 图的尺寸用 `figures.typ` 的 `auto-image`（章文件里 `#import "../figures.typ": auto-image`）：
 横图自动撑满版心宽，竖图自动收到版心高度的 88%。只写 `width` 的竖图会被推高
