@@ -108,6 +108,20 @@ def build_cases(tmp):
     return cases
 
 
+def check_template_invariants():
+    """模板自己的红线（不是 doctor 的规则）：文档里反复强调的两条行为约定。"""
+    bad = []
+    want = "placement: if float-images { auto } else { none }"
+    main_typ = (TEMPLATE / "main.typ").read_text(encoding="utf-8").replace("\r\n", "\n")
+    if want not in main_typ:
+        bad.append(f"main.typ 的插图浮动开关不是 `{want}`")
+    for p in sorted(TEMPLATE.rglob("*.typ")):
+        text = p.read_text(encoding="utf-8").replace("\r\n", "\n")
+        if re.search(r"set figure\(\s*placement:\s*none\s*\)", text):
+            bad.append(f"{p.relative_to(TEMPLATE)}：无条件关掉了插图浮动（页底会留白）")
+    return bad
+
+
 def main():
     if not TEMPLATE.is_dir():
         sys.exit(f"找不到技能模板目录：{TEMPLATE}")
@@ -129,6 +143,13 @@ def main():
                 failed += 1
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+    inv = check_template_invariants()
+    print(f"[{'PASS' if not inv else 'FAIL'}] {'模板不变量（浮动开关/无全局 none）':<22} {len(inv)} 处不合")
+    for line_ in inv:
+        print("        " + line_)
+    if inv:
+        failed += 1
 
     if failed:
         sys.exit(f"{failed} 个用例失败——doctor.py 的规则与模板的实际写法脱节了")
