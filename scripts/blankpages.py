@@ -4,20 +4,25 @@
 背景
 ----
 书页从右页起排，open-right 会自动插空白衬页。这类页面没有页眉页码，
-更不该印切口色标。但「本页是否空白」在 Typst 里没法稳定地自动判定
-（段落位置逐轮摆动，par 查询会触发 convergence 告警），所以
+按本模板的取舍默认也不印切口色标：色标在这里是「页内角落一枚色块」的
+仿真，落在纯白页上会被读成印错。但「本页是否空白」在 Typst 里没法稳定
+地自动判定（段落位置逐轮摆动，par 查询会触发 convergence 告警），所以
 template/pagetabs.typ 里是一行手工清单 `tab-skip-pages`。
-手工清单一改内容就漂：漏一页，空白页上就多出一枚色标。
+
+真书里的色标是切口工艺（模切缺口，或装订后整叠刷边），空白衬页的切口
+本来也带着那叠纸的颜色。若你只做纸书、想更贴真工艺，可以让空白页照样
+印色标：把页码写进同一文件里的 `tab-allow-blank`，本脚本就不再把它当成
+漏网。
 
 本脚本把清单变成可复算的：编译出页图，逐页数非白像素。
 - 纯白的页 = 空白衬页；
-- 「几乎全白、只有切口边一条实心色块」= 那就是漏网的色标。
+- 「几乎全白、只有切口边一条实心色块」= 空白页上印着色标。
 
 用法
 ----
   python scripts/blankpages.py --root <书稿目录>            # 只报告
   python scripts/blankpages.py --root <书稿目录> --write    # 回填清单
-  python scripts/blankpages.py --root <书稿目录> --check    # CI：漂移即 exit 1
+  python scripts/blankpages.py --root <书稿目录> --check    # CI：漏网色标即 exit 1
 
 `--root` 是含 main.typ 与 pagetabs.typ 的目录（scaffold.py 生成的书稿根目录，
 或本技能的 template/ 目录）。
@@ -25,7 +30,7 @@ template/pagetabs.typ 里是一行手工清单 `tab-skip-pages`。
 退出码
 ------
   0  没有问题（或报告模式发现的问题不致命）
-  1  仅 --check：清单漂移 / 空白页仍印色标
+  1  仅 --check：有空白页印了色标，且不在 `tab-allow-blank` 里
   2  环境问题：找不到 typst 或文件、PNG 解不开
 """
 
@@ -54,6 +59,8 @@ FLOOR = 243
 MIN_DARK = 20          # 低于此：判为空白页
 MIN_TAB_PIXELS = 100   # 切口条带里超过此：判为画着色标
 LIST_RE = re.compile(r"^(#let\s+tab-skip-pages\s*=\s*\()([^)]*)(\).*)$", re.M | re.S)
+# 允许带色标的空白页；整行可选，缺席时视为空清单。
+ALLOW_RE = re.compile(r"^#let\s+tab-allow-blank\s*=\s*\(([^)]*)\)", re.M)
 WIDTH_RE = re.compile(r"#let\s+tab-width\s*=\s*([\d.]+)\s*mm")
 
 
@@ -164,6 +171,12 @@ def read_list(tabs: Path) -> list[int]:
     return [int(n) for n in re.findall(r"\d+", m.group(2))]
 
 
+def read_allow(tabs: Path) -> set[int]:
+    """读 `tab-allow-blank`：作者有意让这些空白页保留色标。缺省为空。"""
+    m = ALLOW_RE.search(tabs.read_text(encoding="utf-8"))
+    return {int(n) for n in re.findall(r"\d+", m.group(1))} if m else set()
+
+
 def write_list(tabs: Path, pages: list[int]) -> None:
     text = tabs.read_text(encoding="utf-8")
     m = LIST_RE.search(text)
@@ -213,33 +226,39 @@ def main() -> int:
             stray.append(page_no)
 
     listed = read_list(tabs_file)
-    missing = [p for p in blank if p not in listed]
+    allowed = read_allow(tabs_file)
+    kept = [p for p in stray if p in allowed]        # 有意保留：纸书切口本来带色
+    bad = [p for p in stray if p not in allowed]     # 漏网：清单忘了这一页
+    missing = [p for p in blank if p not in listed and p not in allowed]
     extra = [p for p in listed if p not in blank and p not in stray]
 
     print(f"书稿：{root}")
     print(f"页数：{len(shots)}    空白衬页：{blank or '（无）'}")
-    print(f"清单：{listed or '（空）'}")
-    if stray:
-        print(f"空白页上残留色标：{stray}  ← 这些页是空白页却印了色标（真 bug）")
+    print(f"跳过清单：{listed or '（空）'}    允许带色标：{sorted(allowed) or '（无）'}")
+    if kept:
+        print(f"空白页带色标（tab-allow-blank）：{kept}  ← 有意保留")
+    if bad:
+        print(f"空白页带色标（未允许）：{bad}  ← 漏网，清单该补上这几页")
     if extra:
-        print(f"清单多出：{extra}  ← 这些页并不空白，属过期项（无害，说明内容动过）")
+        print(f"清单多出：{extra}  ← 这些页并不空白，属过期项（无害）")
     if missing:
-        print(f"清单漏掉：{missing}  ← 空白衬页，但不在清单里")
-    if not (stray or extra or missing):
+        print(f"清单漏掉：{missing}  ← 空白页但没印色标，不影响观感")
+    if not (kept or bad or extra or missing):
         print("清单与页面一致。")
 
     if args.write:
-        write_list(tabs_file, blank)
-        print(f"已回填 {tabs_file}：{blank}")
+        pages = sorted(set(blank) - allowed)
+        write_list(tabs_file, pages)
+        print(f"已回填 {tabs_file}：{pages}")
     if args.keep:
         print(f"页图留在 {tmpdir}")
     else:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-    if args.check and (stray or missing or extra):
-        print("结论：清单漂移，按提示修；加 --write 可直接回填。", file=sys.stderr)
+    if args.check and bad:
+        print("结论：有空白页印着色标却没写进 tab-allow-blank——补清单，或确认是有意保留。", file=sys.stderr)
         return 1
-    if not args.write and not args.check and (stray or missing):
+    if not args.write and not args.check and bad:
         print("提示：加 --write 自动回填，或 --check 放进 CI。")
     return 0
 
