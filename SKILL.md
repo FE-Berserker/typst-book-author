@@ -94,10 +94,19 @@ New Computer Modern（西文与数学）、DejaVu Sans Mono（代码）——非
 
 ### 4. 定稿检查
 
-改动内容后必须重做一次，样板里有两处「按物理页码手工维护」的设置：
+改动内容后必须重做一次：空白衬页的位置会随内容移动，而它是一份手工清单。
 
-- `template/pagetabs.typ` 的 `tab-skip-pages`：open-right 自动插入的空白衬页
-  不该印切口色标，翻一遍 PDF 把空白衬页的物理页码填进去；
+```bash
+python <技能目录>/scripts/blankpages.py --root <书稿目录> --check
+# 漂移了就直接回填（会编译页图、按非白像素找出真正的空白页）：
+python <技能目录>/scripts/blankpages.py --root <书稿目录> --write
+```
+
+它报三类问题：`清单漏掉`（空白衬页不在清单里）、`空白页上残留色标`（真 bug：
+空白页印了色标，黑白打印时最显眼）、`清单多出`（内容动过，旧项失效）。
+`--check` 可以放进书稿仓库的 CI——但 CI 上多半没有 SimHei，换字会改变分页，
+所以更稳的是本地定稿前跑一次。
+
 - 章数超过 12 章时色标颜色开始循环（`tab-colors`），可按需补色。
 
 ## 模板文件一览
@@ -114,8 +123,10 @@ New Computer Modern（西文与数学）、DejaVu Sans Mono（代码）——非
 | `runninghead.typ` | 书眉：偶页章名/奇页节名，节标题在页顶时回退章名 |
 | `pagetabs.typ` | 切口色标（拇指索引），颜色与位置随章次递增 |
 
-技能侧的 `scripts/doctor.py`（旧拷贝体检）与 `scripts/test_doctor.py`（体检规则
-自检）**不进书稿项目**，留在技能目录里用。
+技能侧的 `scripts/doctor.py`（旧拷贝体检）、`scripts/test_doctor.py`（体检规则
+自检）、`scripts/blankpages.py`（空白页与切口色标核对）与 `scripts/scaffold.py`
+（建新书）**都不进书稿项目**，留在技能目录里用。仓库根的
+`.github/workflows/check.yml` 会在每次推送时编译样板并跑体检自检。
 
 ## 许可与出处
 

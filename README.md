@@ -30,7 +30,8 @@ typst-book-author/
 ├── scripts/               技能侧工具（不进书稿项目）
 │   ├── scaffold.py        复制模板建新书，顺手写书名/作者/主题
 │   ├── doctor.py          旧拷贝体检（模板版本与已修规则）
-│   └── test_doctor.py     体检规则自检
+│   ├── test_doctor.py     体检规则自检
+│   └── blankpages.py      找空白衬页、核对切口色标清单（定稿前跑，--check 可进 CI）
 └── template/              完整可编译的书籍样板
     ├── main.typ           入口：元数据、字体、目录规则、篇章结构
     ├── colors.typ         主题切换（六主题）与全书配色唯一来源

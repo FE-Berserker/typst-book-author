@@ -1,0 +1,37 @@
+name: check
+
+# 每次推送都重新编译样板并跑体检规则自检：
+# - 模板改坏了（少了括号、改了 import、字体链写错）立刻红；
+# - doctor.py 的规则写歪了（该报不报），test_doctor.py 立刻红。
+# 不跑 blankpages.py：CI 上没有 SimHei，换字会改变分页，空白页清单必然对不上。
+# 那份清单请在本地定稿前用 scripts/blankpages.py 核对。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装 Typst 0.15.1
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/typst.tar.xz" \
+            https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz
+          tar -xf "$RUNNER_TEMP/typst.tar.xz" -C "$RUNNER_TEMP"
+          sudo install -m 0755 "$RUNNER_TEMP/typst-x86_64-unknown-linux-musl/typst" /usr/local/bin/typst
+          typst --version
+
+      - name: 模板能编译
+        run: typst compile template/main.typ "$RUNNER_TEMP/book.pdf"
+
+      - name: 体检规则自检
+        run: python scripts/test_doctor.py
