@@ -59,11 +59,15 @@ CRITICAL_RULES = [
         # 2026-10-04：标题里的西文曾单独指定 Arial，而 SimHei 没有粗体字形、
         # Typst 也不做伪粗——Arial 是真粗体、汉字是常规体，同一个标题里
         # 西文竖笔画比汉字粗 42%。现在中西文同走 SimHei 自带的西文。
+        # 2026-10-29：Noto Sans SC 排前面同样合规（它有真 Bold、中西文字面
+        # 高度一致，粗体标题反而比 SimHei 更稳）。规则本意是「西文别走
+        # Arial」，由 forbid 保证；两两组合的顺序都接受。
         "file": "main.typ",
-        "name": "标题中西文统一走 SimHei 自带西文",
-        "need": r'#show heading: set text\(font: \("SimHei", "Noto Sans SC"\)\)',
+        "name": "标题中西文统一走 SimHei / Noto Sans SC（顺序不限）",
+        "need": r'#show heading: set text\(font: \("(?:SimHei", "Noto Sans SC"'
+                r'|Noto Sans SC", "SimHei")\)\)',
         "forbid": r'#show heading: set text\(font: \("Arial"',
-        "fix": "main.typ 标题一节改成 #show heading: set text(font: (\"SimHei\", \"Noto Sans SC\"))"
+        "fix": "main.typ 标题一节改成 #show heading: set text(font: (\"SimHei\", \"Noto Sans SC\") 或 (\"Noto Sans SC\", \"SimHei\"))"
                  "——让西文走 Arial 会出现「英文明显比中文粗」（Arial 真粗体挨着 SimHei 常规体），"
                  "见技能模板 main.typ 的注释",
     },

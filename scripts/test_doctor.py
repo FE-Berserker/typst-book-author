@@ -75,6 +75,13 @@ def build_cases(tmp):
           '(font: ("Arial", "SimHei", "Noto Sans SC"))')
     cases.append(("标题退回 Arial 混排", d, 1, ["SimHei"]))
 
+    # 2026-10-29：Noto Sans SC 排前同样合规（有真 Bold，中西文字面一致）。
+    # 这条保证 need 正则不会退回「只认一种顺序」。
+    d = fresh(tmp, "notofirst")
+    patch(d, "main.typ", '(font: ("SimHei", "Noto Sans SC"))',
+          '(font: ("Noto Sans SC", "SimHei"))')
+    cases.append(("标题字体换序（Noto 在前）", d, 0, []))
+
     d = fresh(tmp, "headraw")
     patch(d, "main.typ", "show raw.where(block: false)",
           "show raw.where(block: false, nothing)")

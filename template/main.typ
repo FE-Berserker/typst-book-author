@@ -13,7 +13,7 @@
 //   多由「不跨页的提示框正好卡在页尾」引起。经验做法是微调该处内容或挪动小节位置
 //   （实测挪一节的位置即可恢复收敛），输出 PDF 本身不受影响。
 #import "@preview/bookly:5.1.1": *
-#import "pagetabs.typ": page-tab, page-tab-off
+#import "pagetabs.typ": page-tab, page-tab-off, tab-colors
 #import "partpage.typ": part-page, toc-part-entry
 #import "chaptermark.typ": chapter-mark, margin-inside, margin-outside
 #import "runninghead.typ": book-header
@@ -24,7 +24,7 @@
 
 // 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
 // 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
-#let template-version = "2026-10-04"
+#let template-version = "2026-10-30"
 
 // ---- 标题页（封面 + 版权页）----
 // 外面套一层 set par：Bookly 的标题页是在本文档的作用域里生成的，正文那条
@@ -215,18 +215,64 @@
 
 // ---- 表格：统一列对齐，禁止单元格两端对齐 ----
 // 列默认左对齐，需要居中的列（公式、图标、数字）在各自的 table 里单独指定；
-// 早先不设这一条，各表的列对齐由行文环境决定，结果表 1.1 是「左/中/右」、
-// 表 C.1 是「左/左/左」、表 D.1 是「中/中/左」，同一本书三套规矩。
+// 早先不设这一条，各表的列对齐由行文环境决定，结果同一本书可能有几套规矩。
 #set table(align: (left, left, left))
-// 列与列之间留点气口：不设列间距时图标列会顶到下一列的文字上
-// （表 C.1 的「▮ 定义 | 章内编号」最明显）。用单元格内边距而不是 column-gutter：
-// Typst 会把 table 的 stroke 画进 gutter 里，一加 gutter 就多出竖线，
-// 三线表就破了；内边距只是留白，不动线。首列不加左内边距，表格左缘仍与正文对齐。
-#show table.cell: set table.cell(inset: (x: 0.5em, y: 0.15em))
-#show table.cell.where(x: 0): set table.cell(inset: (left: 0pt, right: 0.5em, y: 0.15em))
-// 窄格里两端对齐会把最后一行撑开（表 F.1 的「……材质都在源码里调」就是），
-// 逐格关掉：表格里的文字本来就该左齐、右边自然参差。
+// 列与列之间留点气口。用单元格内边距而不是 column-gutter：Typst 会把
+// stroke 画进 gutter 里，多出竖线；内边距只是留白，不动线。首列左缘与正文对齐。
+#show table.cell: set table.cell(inset: (x: 0.5em, y: 0.25em))
+#show table.cell.where(x: 0): set table.cell(inset: (left: 0pt, right: 0.5em, y: 0.25em))
+// 窄格里两端对齐会把最后一行撑开，逐格关掉。
 #show table.cell: set par(justify: false)
+
+// ---- 轻快表格：当前章浅底表头 + 极淡隔行底色 ----
+// 与切口色标共用 tab-colors：第 1 章用全书主题色，后续章按蓝/绿/橙…换色。
+// 只统计有编号的一级标题，与 pagetabs.typ 的章次口径一致；前置部分没有
+// 编号章时回退到全书主题色。查询放在 context 中，跨页表的每段仍取本章颜色。
+#let table-chapter-color() = {
+  let heads = query(selector(heading.where(level: 1)).before(here()))
+    .filter(h => h.numbering != none)
+  if heads.len() == 0 {
+    book-colors.primary
+  } else {
+    let idx = heads.len() - 1
+    tab-colors.at(calc.min(idx, tab-colors.len() - 1))
+  }
+}
+// 不画竖线，也不给每个数据行加横线；表头下线用中性灰，表头浅底、
+// 隔行浅底和表格底线随当前章换色。比三线表轻松，也保留扫描行的参照。
+#set table(stroke: (x, y) => (
+  top: none,
+  bottom: if y == 0 { 0.7pt + book-colors.ink.lighten(25%) } else { none },
+  left: none,
+  right: none,
+))
+// 底色在重建表格时读取当前章；显式给了 fill 的表仍以自己的设置为准，
+// 想关掉默认底色可写 fill: white。底线必须在表格内部追加，外包 block
+// 会破坏跨页表头重复。末尾 hline 同时是重建守卫，避免 show 规则无限递归。
+#show table: it => context {
+  let kids = it.children
+  if kids.len() > 0 and kids.last().func() == table.hline { return it }
+  let accent = table-chapter-color()
+  let default-fill = (x, y) => if y == 0 {
+    accent.lighten(85%)
+  } else if calc.even(y) {
+    accent.lighten(94%)
+  } else {
+    none
+  }
+  table(
+    columns: it.columns,
+    rows: it.rows,
+    column-gutter: it.column-gutter,
+    row-gutter: it.row-gutter,
+    align: it.align,
+    inset: it.inset,
+    stroke: it.stroke,
+    fill: if it.fill == none { default-fill } else { it.fill },
+    ..kids,
+    table.hline(position: top, stroke: 0.8pt + accent),
+  )
+}
 
 // ---- 题注与目录条目 ----
 // 中文题注惯例是「图 1.1　标题」，用的是全角空格，不是西文的连接号

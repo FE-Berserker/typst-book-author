@@ -33,6 +33,7 @@
      book-colors.olive, book-colors.gray)
     .filter(c => c != book-colors.primary),
 )
+// main.typ 的默认表格也复用这张色表：表头、隔行浅底与底线跟当前章色标一致。
 
 #let outer-side-only = true
 
