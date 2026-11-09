@@ -35,3 +35,9 @@ jobs:
 
       - name: 体检规则自检
         run: python scripts/test_doctor.py
+
+      # Typst 0.15.1 会把 table.header 里的 rowspan 静默丢掉（后面的表头格左移一格，
+      # 单位行落到错的列下）。tables.typ / main.typ 加了守卫把它变成编译错误，
+      # 这一步守住那条守卫，同时确认正文行的跨行没被误伤。
+      - name: 表格跨行回归
+        run: python scripts/test_table_span.py

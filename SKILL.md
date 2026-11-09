@@ -90,6 +90,14 @@ python <技能目录>/scripts/doctor.py --root <用户项目>
 )
 ```
 
+合并单元格：**表头只能 `colspan`，`rowspan` 写进正文行**。`table.header(...)` 要复制
+到每段续表的顶部，里面没有「下一行」可以跨，表头里的 `rowspan` 会被 Typst 静默
+丢弃（0.15.1 实测不报错），该格只占一行、后面那排表头格整体左移一格——单位行、
+子表头落到错的列下面。`long-table` 与 `main.typ` 的 `show table` 规则都加了守卫，
+再这么写会直接编译失败并给出改法。合并单位行用 `table.cell(colspan: 3)[单位：mm]`；
+确实要跨行合并就写成正文第一行 `table.cell(rowspan: 2)[...]`——正文行的跨行正常，
+行高跟着内容长。行高只有一种压扁方式：自己写死 `rows: (1em, ...)`。
+
 插图默认就浮动（Typst `figure(placement: auto)` 的固有行为）：图比剩余版面高时
 挪到下一页顶部，正文接着往下排，页底不会空出一截（实测默认 0.5cm，关掉后 17cm）。
 `main.typ` 里的 `#let float-images` 只用来关掉它（改 `false` 等于 `placement: none`，

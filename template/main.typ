@@ -19,12 +19,12 @@
 #import "runninghead.typ": book-header
 #import "boxes.typ": book-boxeq, book-custom-box
 #import "colors.typ": book-colors
-#import "tables.typ": long-table
+#import "tables.typ": long-table, head-rowspan-msg, table-head-takes-rowspan
 #import "figures.typ": auto-image
 
 // 模板版本：scripts/doctor.py 用它判断书稿项目里的这份拷贝是否落后于技能模板。
 // 旧拷贝可能缺已修复的规则（如「表题在表格上方」），开工前先跑 doctor 体检。
-#let template-version = "2026-10-30"
+#let template-version = "2026-11-09"
 
 // ---- 标题页（封面 + 版权页）----
 // 外面套一层 set par：Bookly 的标题页是在本文档的作用域里生成的，正文那条
@@ -252,6 +252,8 @@
 #show table: it => context {
   let kids = it.children
   if kids.len() > 0 and kids.last().func() == table.hline { return it }
+  // 表头里的跨行会被 Typst 静默丢弃（判据与报错见 tables.typ），重建出来会错列。
+  if table-head-takes-rowspan(kids) { panic(head-rowspan-msg) }
   let accent = table-chapter-color()
   let default-fill = (x, y) => if y == 0 {
     accent.lighten(85%)
