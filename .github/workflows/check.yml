@@ -33,6 +33,11 @@ jobs:
       - name: 模板能编译
         run: typst compile template/main.typ "$RUNNER_TEMP/book.pdf"
 
+      # geostyle.typ 是纯模块，不被 import 就不参与编译；这里单独跑它的冒烟示例，
+      # 保证改复合线斜接 / 扇形角度 / 行内记号基线时 CI 立刻红。
+      - name: 几何模块冒烟
+        run: typst compile --root . tests/geostyle/demo.typ "$RUNNER_TEMP/geostyle.pdf"
+
       - name: 体检规则自检
         run: python scripts/test_doctor.py
 

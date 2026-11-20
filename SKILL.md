@@ -124,6 +124,51 @@ python <技能目录>/scripts/doctor.py --root <用户项目>
 负号与数学量进数学模式（`$-40$`）。同一句边界声明全文只挂一次，重复的
 免责与适用范围归脚注。详见 `references/pitfalls.md`「指称、数值与符号」。
 
+#### 几何图（geostyle.typ）
+
+图里是**真几何**——点、线、圆、角、弧、多边形，而且这些图元要在正文里被引用
+（「在 AB 上作…」「与圆 cA 交于…」）——用 `geostyle.typ`，别用 `sketch`。尺规作图、
+几何证明、构造性示意图都属于这类；一次性涂鸦不划算，那种还是 `sketch`。
+
+```typst
+#import "../geostyle.typ": *
+
+#let fig = geo(
+  points:  ("A": (0, 0), "B": (1, 0), "C": (0.5, 0.8660254)),
+  lines:   ("AB": (a: "A", b: "B", color: "ink")),
+  circles: ("cA": (center: "A", through: "B", color: "built")),
+  polys:   ("T3": (pts: ("C", "A", "B"), colors: ("aux", "ink", "given"))),  // 逐边异色复合线
+  angles:  ("ACB": (from: "A", at: "C", to: "B", color: "aux", style: "sector")),
+)
+#figure(geo-figure(fig, length: 15mm), caption: […]) <fig:t3>
+```
+
+四条不变量，缺一条就不是这个风格：
+
+1. **命名图元**：先 `geo(...)` 登记，再按名字绘制。定义与绘制分离——改图只改注册表，
+   正文引用的是同一个 `cA`，不是「图 3 里那个圆」。
+2. **一物一色**：颜色标的是**哪个对象**，不是**什么角色**。同一个圆在主图、行内记号、
+   算式里永远同色；两个同为构造物的圆可以一蓝一红。配色固定为 Byrne 四色
+   （`given` `#d94c1a` / `built` `#265999` / `aux` `#f2b31a` / `ink` `#111111`），
+   **不跟 book-theme 走**——几何图的颜色是语义，换章换色就不是同一张图了。
+3. **行内重绘**：正文里的 ▬ ◯ △ 不是字体字形，是同一批图元缩到 1/3 重画
+   （`tok-line` / `tok-mini` / `tok-angle` / `tok-point` / `tok-right`）。
+   `tok-mini` 传的是「要重画哪些图元」，不是「画什么符号」：
+   `tok-mini(fig, ("cA",))` 是空圆环，`tok-mini(fig, ("cA", "AB"))` 才是带半径的圆。
+4. **图式等式**：证明写成一行一步的记号等式——`#align(center, par[…])` 里排，
+   一行一个推理，不是两段散文。
+
+线宽只有三档（`gw.reg` 2pt / `thin` 1pt / `hair` 0.5pt），主图与记号同宽。记号看着
+粗壮是 1/3 缩放把 2pt 相对放大三倍的自然结果，不是加粗——想细就缩小 `length`，
+别改 `weight`。
+
+`labels: true` 与 `marks:` 是**可选**叠加（斜体字母标签 + 点记号 ∧）：Byrne 1847
+原书一个都没有，那是 `byrne-latex` 依 Tufte 建议加的第二层，本模块默认关闭。
+
+可编译的完整示例见 `tests/geostyle/demo.typ`，编译要带 `--root <技能目录>`
+（它在 `tests/` 里，要 import `../template/`，否则 Typst 报 would escape the project root）。
+
+
 ### 3. 编译
 
 ```bash
@@ -170,6 +215,7 @@ python <技能目录>/scripts/blankpages.py --root <书稿目录> --write
 | `colors.typ` | 全书配色唯一来源：顶部一行切换主题（六主题内置），改色只改这里 |
 | `boxes.typ` | 提示框/定理环境/加框公式，Heroicons 图标 |
 | `figstyle.typ` | CeTZ 示意图、Fletcher 流程图、Lilaq 数据图的统一样式 |
+| `geostyle.typ` | 几何绘图（Byrne 风格）：命名图元注册表、一物一色、行内重绘记号、图式等式；配色固定不跟主题 |
 | `code-theme.tmTheme` | 代码块语法高亮主题（syntect）：Typst 自带高亮，这份把配色换成调色板同源；`main.typ` 的 `set raw(theme:)` 引用 |
 | `partpage.typ` | 篇章页（满版浅底 + 空心篇次数字 + 本篇小目录）与目录「篇」行 |
 | `chaptermark.typ` | 章首页装饰章号；装订边距（inside/outside）也定义在这里 |
